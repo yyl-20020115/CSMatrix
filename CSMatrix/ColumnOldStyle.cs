@@ -1,42 +1,32 @@
-﻿using System;
+﻿namespace CSMatrix;
 
-namespace CSMatrix
+public class ColumnOldStyle
 {
-    public class ColumnOldStyle
+    private static readonly Random random = new();
+    private bool isCurrentWhite;
+    public int length;
+
+    public ColumnOldStyle()
     {
-        private static readonly Random random = new Random();
-        private bool isCurrentWhite;
-        public int length;
+        isCurrentWhite = true;
+        length = GetRandomSpaceSize();
+    }
+    private static int GetRandomSpaceSize() =>
+        //return random.Next(max * 20 / 100, max * 90 / 100);
+        random.Next(10, 50);
 
-        public ColumnOldStyle()
-        {
-            isCurrentWhite = true;
-            length = GetRandomSpaceSize();
-        }
-        private int GetRandomSpaceSize()
-        {
-            //return random.Next(max * 20 / 100, max * 90 / 100);
-            return random.Next(10, 50);
-        }
+    private int RandomCharSize =>
+        //return random.Next(max * 20 / 100, max * 90 / 100);
+        random.Next(10, 20);
 
-        private int GetRandomCharSize()
+    public char GetNextChar()
+    {
+        length--;
+        if (length == -1)
         {
-            //return random.Next(max * 20 / 100, max * 90 / 100);
-            return random.Next(10, 20);
+            isCurrentWhite = !isCurrentWhite;
+            length = isCurrentWhite ? GetRandomSpaceSize() : RandomCharSize;
         }
-
-        public char GetNextChar()
-        {
-            length--;
-            if (length == -1)
-            {
-                isCurrentWhite = !isCurrentWhite;
-                if (isCurrentWhite)
-                    length = GetRandomSpaceSize();
-                else length = GetRandomCharSize();
-            }
-            if (isCurrentWhite) return ' ';
-            return CharUtils.GetRandomChar();
-        }
+        return isCurrentWhite ? ' ' : CharUtils.GetRandomChar();
     }
 }
