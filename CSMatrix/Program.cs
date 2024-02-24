@@ -1,4 +1,5 @@
 ﻿using CommandLine;
+using System.Text;
 
 namespace CSMatrix;
 
@@ -22,30 +23,30 @@ public class Program
         ExitIfQPressed();
     }
 
-    private static void HideCursor()
-    {
-        Console.CursorVisible = false;
-    }
+    private static void HideCursor() 
+        => Console.CursorVisible = false;
 
     private static void ParseArguments(string[] args)
     {
         var result = Parser.Default.ParseArguments<Options>(args)
             .WithParsed(option =>
             {
-                if (option.OldStyle) scrollStyle = ScrollStyle.OldStyle;
-                if (option.Delay != delayLevel)
+                if (option.OldStyle) 
+                    scrollStyle = ScrollStyle.OldStyle;
+                if (option.Delay != delayLevel 
+                    && (option.Delay <= 10 || option.Delay >= 1))
                 {
-                    if (option.Delay <= 10 || option.Delay >= 1)
-                    {
-                        delayLevel = option.Delay;
-                        delay = 10 * delayLevel;
-                    }
+                    delay = 10 * (delayLevel = option.Delay);
                 }
-                if (option.Color.ToLower() != ScrollColors.Default.Key)
-                    Console.ForegroundColor = ScrollColors.Parse(option.Color);
-                else Console.ForegroundColor = ScrollColors.Default.Value;
+                Console.ForegroundColor = 
+                    ! option.Color.Equals(
+                        ScrollColors.Default.Key,
+                        StringComparison.CurrentCultureIgnoreCase) 
+                    ? ScrollColors.Parse(option.Color) 
+                    : ScrollColors.Default.Value
+                    ;
             })
-            .WithNotParsed<Options>(option =>
+            .WithNotParsed(option =>
             {
                 ResetShell();
                 Environment.Exit(0);
@@ -79,7 +80,7 @@ public class Program
             else
                 ScrollOldStyleColumns();
             PrintLines();
-            if (IsSizeChanged()) RefreshSizeAndColumns();
+            if (IsSizeChanged) RefreshSizeAndColumns();
             await Task.Delay(delay); //70 is the slowest in unix shell
         }
         Console.Clear();
@@ -99,10 +100,11 @@ public class Program
 
         for (int i = 0; i < HEIGHT; i++)
         {
-            string newLine = string.Empty;
+            var builder = new StringBuilder();
             for (int j = 0; j < WIDTH; j++)
-                newLine += newStyleColumns[j].GetChar(i);
-            lines[i] = newLine;
+                builder.Append(
+                    newStyleColumns[j].GetChar(i));
+            lines[i] = builder.ToString();
         }
     }
 
@@ -110,18 +112,16 @@ public class Program
     {
         for (int i = lines.Length - 1; i >= 1; i--)
             lines[i] = lines[i - 1];
-
-        string newLine = string.Empty;
+        var builder = new StringBuilder();
         foreach (var column in oldStyleColumns)
-            newLine += column.GetNextChar();
-        lines[0] = newLine;
+            builder.Append(column.GetNextChar());
+        lines[0] = builder.ToString();
     }
 
-    private static bool IsSizeChanged()
-    {
-        return HEIGHT != Console.WindowHeight - 1
-            || WIDTH != Console.WindowWidth - 1;
-    }
+    private static bool IsSizeChanged 
+        => HEIGHT != Console.WindowHeight - 1
+        || WIDTH != Console.WindowWidth - 1
+        ;
 
     private static void RefreshSizeAndColumns()
     {
@@ -135,7 +135,8 @@ public class Program
     {
         if (scrollStyle == ScrollStyle.NewStyle)
             RefreshNewStyleColumns();
-        else RefreshOldStyleColumns();
+        else 
+            RefreshOldStyleColumns();
     }
 
     private static void RefreshNewStyleColumns()
@@ -143,7 +144,7 @@ public class Program
         CleanLines();
         newStyleColumns = new ColumnNewStyle[WIDTH];
         for (int i = 0; i < WIDTH; i++)
-            newStyleColumns[i] = new ColumnNewStyle(i, HEIGHT);
+            newStyleColumns[i] = new (i, HEIGHT);
     }
 
     private static void RefreshOldStyleColumns()

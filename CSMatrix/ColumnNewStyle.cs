@@ -10,8 +10,7 @@ public class ColumnNewStyle
     public ColumnNewStyle(int XPos, int size)
     {
         X = XPos;
-        fullSize = size;
-        chars = new char[size];
+        chars = new char[fullSize = size];
         worms =
         [
             WormGenerator.Create(fullSize)
@@ -41,20 +40,15 @@ public class ColumnNewStyle
     private void RefreshChars()
     {
         foreach (var worm in worms)
-        {
             // TODO: improve this :/
-            for (int i = 0; i < worm.Size; i++)
-            {
-                if (worm.Y - i <= 0) continue;
-                if (worm.Y - i > 0 && worm.Y - i < fullSize)
-                {
-                    if (i < worm.SpaceSize) chars[worm.Y - i] = ' ';
-                    else chars[worm.Y - i] = worm.Chars[worm.Y - i];
-                }
-            }
-        }
+            for (var i = 0; i < worm.Size; i++)
+                if (worm.Y - i <= 0) 
+                    continue;
+                else if (worm.Y - i > 0 && worm.Y - i < fullSize)
+                    chars[worm.Y - i] = i < worm.SpaceSize 
+                        ? ' ' : worm.Chars[worm.Y - i];
     }
 
-    public char GetChar(int YPos) => chars[YPos];
-
+    public char GetChar(int YPos) 
+        => chars[YPos];
 }

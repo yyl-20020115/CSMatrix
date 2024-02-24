@@ -7,11 +7,10 @@ public class WormGenerator()
     public static Worm Create(int maxSize)
     {
         SetSpaceAndCharSize(maxSize, out int spaceSize, out int charSize);
-
         var chars = new char[maxSize];
         for (int i = 0; i < maxSize; i++)
             chars[i] = CharUtils.GetRandomChar();
-        return new Worm(spaceSize, charSize, chars);
+        return new (spaceSize, charSize, chars);
     }
 
     private static void SetSpaceAndCharSize(int maxSize, out int spaceSize, out int charSize)

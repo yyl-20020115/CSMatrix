@@ -14,6 +14,9 @@ public static class ScrollColors
     };
 
     public static ConsoleColor Parse(string colorStr)
-        => colors.ContainsKey(colorStr.ToLower()) ? colors[colorStr.ToLower()] : Default.Value;
+        => colors.ContainsKey(colorStr.ToLower()) 
+            ? colors[colorStr.ToLower()] 
+            : Default.Value
+            ;
 
 }
